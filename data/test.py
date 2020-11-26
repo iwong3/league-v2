@@ -1,1 +1,0 @@
-print("SELECT id FROM {} WHERE id = ?".format("TEST"))
