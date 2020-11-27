@@ -53,10 +53,17 @@ def get_match():
         res_obj = {}
         # add each column to response object
         for i in range(len(row)):
-            if "champion_id" == column_names[i]:
-                res_obj[column_names[i]] = map_util.get_champion_name(row[i])
-            else:
-                res_obj[column_names[i]] = row[i]
+            curr_col_name = column_names[i]
+            res_obj[curr_col_name] = row[i]
+            # add extra field for id values that have mappings
+            if "champion_id" == curr_col_name:
+                res_obj["champion_name"] = map_util.get_champion_name(row[i])
+            elif "map_id" == curr_col_name:
+                res_obj["map_name"] = map_util.get_league_map_name(row[i])
+            elif "queue_id" == curr_col_name:
+                res_obj["queue_description"] = map_util.get_queue(row[i])
+            elif "season_id" == curr_col_name:
+                res_obj["season_name"] = map_util.get_season(row[i])
         res.append(res_obj)
 
     return jsonify(res)

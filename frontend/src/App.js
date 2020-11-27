@@ -10,30 +10,30 @@ export default class App extends Component {
         super(props)
 
         this.state = {
-            match_history_data: []
+            match_data: []
         }
     }
 
     componentDidMount() {
 
-        const match_history_url = "http://localhost:5000/match-history"
-        axios.get(match_history_url).then(resp => {
+        const match_url = "http://localhost:5000/match"
+        axios.get(match_url).then(resp => {
             this.setState({
-                match_history_data: resp.data
+                match_data: resp.data
             })
         })
 
     }
 
-    renderMatchHistory = () => {
+    renderMatches() {
 
-        let match_history = []
-        for (let i = 0; i < this.state.match_history_data.length; i++) {
-            match_history.push(<div>Champion: {this.state.match_history_data[i]["champion_name"]}</div>)
-            match_history.push(<div>Played At: {this.state.match_history_data[i]["date"]}</div>)
+        let matches = []
+        for (let i = 0; i < this.state.match_data.length; i++) {
+            matches.push(<div>Champion: {this.state.match_data[i]["champion_name"]}</div>)
+            matches.push(<div>Win/Loss: {this.state.match_data[i]["win"]}</div>)
         }
         return (
-            <div>{match_history}</div>
+            <div>{matches}</div>
         )
 
     }
@@ -41,8 +41,8 @@ export default class App extends Component {
     render() {
         return (
             <div className="App">
-                <h1> Match History! </h1>
-                {this.state.match_history_data.length ? this.renderMatchHistory() : <none/>}
+                <h1> Match Data! </h1>
+                {this.state.match_data.length ? this.renderMatches() : <none/>}
             </div>
         );
     }
