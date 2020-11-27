@@ -5,6 +5,37 @@ import os
 import requests
 import sqlite3
 
+from constants import constants
+
+# VISUALIZATIONS IDEAS
+# - champions vs. avg win rate
+# - champions vs. avg win time
+# - items vs. avg win rate
+# - items vs. avg win time
+# - champions vs. avg types of damage dealt
+# - champiopns vs. time ccing others
+# - champions vs. wards placed
+# - champions vs. runes
+# - runes vs. avg win rate
+# - runes vs. avg win time
+# - first blood vs. avg win rate
+# - first turret vs. avg win rate
+# - champions vs. killing sprees
+# - champions vs. time alive
+# - scatterplot - dmg dealt vs. dmg taken, dots = green/red, win/loss
+
+# ML IDEAS
+# - Win/loss (and time?) predictions based on kda/items/champs/runes
+#   - this is really cool, could apply to live games and see if predictions match outcome
+# - Predict champion being played based on kda/items/runes
+
+# NEXT STEPS
+# - Load more data (100,000 rows for analysis?)
+# - Create backend endpoints to access db (probably can just get all data, can create queries based on functionality)
+# - Backend should map values to more meaningful context
+# - Create a basic visualization with d3
+# - Think about meaningful front end UI, functionality (instead of showing a bunch of graphs, maybe have sections/user choice)
+#   - User could filter by patch/champ/map
 
 # load env vars
 load_dotenv()
@@ -23,10 +54,7 @@ request_headers = { "X-Riot-Token": RIOT_API_KEY }
 RATE_LIMIT_CALLS = 90
 RATE_LIMIT_DURATION = 120 # 2 minutes
 
-# init db constants
-MATCH_TABLE_NAME = "Match"
-MATCH_TEAM_TABLE_NAME = "MatchTeam"
-MATCH_PARTICIPANTS_TABLE_NAME = "MatchParticipants"
+# db constants
 MAX_MATCHES_TO_INSERT = 1000
 
 count = 1
@@ -62,7 +90,7 @@ def get_matches(summoner_name):
 
     # for all account ids
     while len(account_ids) > 0 and matches_inserted < MAX_MATCHES_TO_INSERT:
-        
+
         # get matchlist
         account_id = account_ids.pop()
         matchlist_request_url = NA_ENDPOINT + MATCHLIST_BY_ACCOUNT_PATH + account_id
@@ -71,14 +99,14 @@ def get_matches(summoner_name):
         # add all match ids from matchlist that haven't not already been stored
         for match in matchlist_response_data["matches"]:
             match_id = match["gameId"]
-            cursor.execute("SELECT id FROM {} WHERE id = ?".format(MATCH_TABLE_NAME), (match_id,))
+            cursor.execute("SELECT id FROM {} WHERE id = ?".format(constants.MATCH_TABLE_NAME), (match_id,))
             data = cursor.fetchone()
             if data is None:
                 match_ids.append(match_id)
-        
+
         # for all match ids
         while len(match_ids) > 0 and matches_inserted < MAX_MATCHES_TO_INSERT:
-            
+
             # get match
             match_id = match_ids.pop()
             match_request_url = NA_ENDPOINT + MATCH_BY_ID_PATH + str(match_id)
@@ -91,7 +119,7 @@ def get_matches(summoner_name):
                 "INSERT INTO {} "
                 "(id, game_creation, game_duration, game_mode, game_type, game_version,"
                 " map_id, queue_id, season_id)"
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)".format(MATCH_TABLE_NAME)
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)".format(constants.MATCH_TABLE_NAME)
             )
             try:
                 cursor.execute(match_sql, (
@@ -110,7 +138,7 @@ def get_matches(summoner_name):
                 " first_blood, first_baron, first_dragon, first_inhibitor, first_rift_herald, first_tower,"
                 " baron_kills, dragon_kills, inhibitor_kills, rift_herald_kills, tower_kills,"
                 " champion_ban_1, champion_ban_2, champion_ban_3, champion_ban_4, champion_ban_5)"
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)".format(MATCH_TEAM_TABLE_NAME)
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)".format(constants.MATCH_TEAM_TABLE_NAME)
             )
             # one for each team in match
             for team in match_response_data["teams"]:
@@ -136,7 +164,7 @@ def get_matches(summoner_name):
                     ))
                 except Exception as e:
                     print(e)
-            
+
             # insert into MatchParticipants table
             match_participants_sql = (
                 "INSERT INTO {} "
@@ -170,7 +198,7 @@ def get_matches(summoner_name):
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                 "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                 "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)".format(MATCH_PARTICIPANTS_TABLE_NAME)
+                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)".format(constants.MATCH_PARTICIPANTS_TABLE_NAME)
             )
             # one for each participant in match
             for p in match_response_data["participants"]:
@@ -215,14 +243,14 @@ def get_matches(summoner_name):
             conn.commit()
 
             matches_inserted += 1
-            
+
             # add participant account ids
             for participant in match_response_data["participantIdentities"]:
                 account_id = participant["player"]["accountId"]
                 account_ids.append(account_id)
-    
+
     conn.close()
-    
+
 
 @sleep_and_retry
 @limits(calls=RATE_LIMIT_CALLS, period=RATE_LIMIT_DURATION)
@@ -233,10 +261,10 @@ def call_api(url, headers):
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
         raise Exception(url, "failed with", response.status_code)
-    
+
     print("Call",count)
     count += 1
-    
+
     return response
 
 
