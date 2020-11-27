@@ -3,6 +3,7 @@ import { Component } from 'react';
 import axios from 'axios';
 
 import DmgScatterplot from "../dmg-scatterplot/dmg-scatterplot";
+import './home.css';
 
 
 export default class Home extends Component {
