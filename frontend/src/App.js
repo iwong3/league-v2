@@ -1,6 +1,9 @@
 import { Component } from 'react';
 
 import axios from 'axios';
+
+import DmgScatterplot from "./dmg-scatterplot/dmg-scatterplot";
+
 import './App.css';
 
 
@@ -41,8 +44,7 @@ export default class App extends Component {
     render() {
         return (
             <div className="App">
-                <h1> Match Data! </h1>
-                {this.state.match_data.length ? this.renderMatches() : <none/>}
+                <DmgScatterplot/>
             </div>
         );
     }
