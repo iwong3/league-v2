@@ -7,35 +7,6 @@ import sqlite3
 
 from constants import constants
 
-# VISUALIZATIONS IDEAS
-# - champions vs. avg win rate
-# - champions vs. avg win time
-# - items vs. avg win rate
-# - items vs. avg win time
-# - champions vs. avg types of damage dealt
-# - champiopns vs. time ccing others
-# - champions vs. wards placed
-# - champions vs. runes
-# - runes vs. avg win rate
-# - runes vs. avg win time
-# - first blood vs. avg win rate
-# - first turret vs. avg win rate
-# - champions vs. killing sprees
-# - champions vs. time alive
-# - scatterplot - dmg dealt vs. dmg taken, dots = green/red, win/loss
-
-# ML IDEAS
-# - Win/loss (and time?) predictions based on kda/items/champs/runes
-#   - this is really cool, could apply to live games and see if predictions match outcome
-# - Predict champion being played based on kda/items/runes
-
-# NEXT STEPS
-# - Load more data (100,000 rows for analysis?)
-# - Create backend endpoints to access db (probably can just get all data, can create queries based on functionality)
-# - Backend should map values to more meaningful context
-# - Create a basic visualization with d3
-# - Think about meaningful front end UI, functionality (instead of showing a bunch of graphs, maybe have sections/user choice)
-#   - User could filter by patch/champ/map
 
 # load env vars
 load_dotenv()
@@ -57,6 +28,7 @@ RATE_LIMIT_DURATION = 120 # 2 minutes
 # db constants
 MAX_MATCHES_TO_INSERT = 1000
 
+# for printing calls
 count = 1
 
 
