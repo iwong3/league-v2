@@ -20,6 +20,8 @@ export default class DmgScatterplot extends Component {
             this.setState({
                 match_data: resp.data
             });
+        }).then(resp => {
+            this.renderScatterplot();
         });
     }
 
@@ -136,7 +138,6 @@ export default class DmgScatterplot extends Component {
     render() {
         return (
             <div className="dmg-scatterplot">
-                {this.state.match_data.length ? this.renderScatterplot() : <none/>}
             </div>
         );
     }

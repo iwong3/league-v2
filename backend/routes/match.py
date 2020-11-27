@@ -14,7 +14,7 @@ from utility import constants, map_util, sqlite_util
 match_bp = Blueprint("match", __name__)
 
 # constants
-DEFAULT_ROW_LIMIT = 100
+DEFAULT_ROW_LIMIT = 1000
 
 
 def get_blueprint():
