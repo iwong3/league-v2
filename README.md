@@ -29,6 +29,9 @@
 - Create a basic visualization with d3
 - Think about meaningful front end UI, functionality (instead of showing a bunch of graphs, maybe have sections/user choice)
   - User could filter by patch/champ/map
+- Think about data filtering for all graphs vs. per graph
+    - Could allow filtering for all graphs, but also allow per-graph filtering
+    - Dynamic graph titles/labels
 
 ### IMMEDIATE NEXT STEPS
 - all `__pycache__` to `.gitignore`
