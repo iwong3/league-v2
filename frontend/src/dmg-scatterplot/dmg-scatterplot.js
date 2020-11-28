@@ -161,8 +161,7 @@ export default class DmgScatterplot extends Component {
 
     render() {
         return (
-            <div className="dmg-scatterplot">
-            </div>
+            <div className="dmg-scatterplot"/>
         );
     }
 
