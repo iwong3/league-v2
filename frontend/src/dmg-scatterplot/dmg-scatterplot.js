@@ -110,8 +110,25 @@ export default class DmgScatterplot extends Component {
 
         // dot styling
         const dot_radius = 5;
+        const dot_radius_hover = 10;
         const dot_win_color = "green";
         const dot_lose_color = "red";
+
+        // dot on hover
+        function handleMouseOver(d) {
+            // cursor and dot styling
+            d3.select(this)
+                .style("cursor", "pointer")
+                .style("filter", "brightness(1.5)")
+                .attr("r", dot_radius_hover);
+        }
+
+        function handleMouseOut(d) {
+            // cursor and dot styling
+            d3.select(this)
+                .style("cursor", "none")
+                .attr("r", dot_radius);
+        }
 
         // draw dots
         svg.selectAll(".dot")
@@ -131,7 +148,14 @@ export default class DmgScatterplot extends Component {
                 }
                 return dot_lose_color;
             })
-            .style("opacity", 0.5);
+            .style("opacity", 0.5)
+            .style("transition", "all 0.2s ease-in-out")
+            .on("mouseover", function(d) {
+                handleMouseOver.apply(this);
+            })
+            .on("mouseout", function(d) {
+                handleMouseOut.apply(this);
+            });
 
     }
 
