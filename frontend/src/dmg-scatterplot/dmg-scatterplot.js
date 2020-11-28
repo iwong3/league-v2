@@ -43,23 +43,26 @@ export default class DmgScatterplot extends Component {
         let min_dmg_taken = Number.MAX_SAFE_INTEGER;
         let max_dmg_taken = 0;
         this.state.match_data.forEach(function(match) {
-            // create and add scatterplot data
-            const data = {
-                "dmg_dealt": match["total_damage_dealt"],
-                "dmg_taken": match["total_damage_taken"],
-                "win": match["win"]
-            }
-            dmg_scatterplot_data.push(data);
-            // check for min/max
-            if (match["total_damage_dealt"] < min_dmg_dealt) {
-                min_dmg_dealt = match["total_damage_dealt"];
-            } else if (match["total_damage_dealt"] > max_dmg_dealt) {
-                max_dmg_dealt = match["total_damage_dealt"];
-            }
-            if (match["total_damage_taken"] < min_dmg_taken) {
-                min_dmg_taken = match["total_damage_taken"];
-            } else if (match["total_damage_taken"] > max_dmg_taken) {
-                max_dmg_taken = match["total_damage_taken"];
+            // skip matches that aren't summoner's rift
+            if (match["map_id"] === 11) {
+                // create and add scatterplot data
+                const data = {
+                    "dmg_dealt": match["total_damage_dealt"],
+                    "dmg_taken": match["total_damage_taken"],
+                    "win": match["win"]
+                }
+                dmg_scatterplot_data.push(data);
+                // check for min/max
+                if (match["total_damage_dealt"] < min_dmg_dealt) {
+                    min_dmg_dealt = match["total_damage_dealt"];
+                } else if (match["total_damage_dealt"] > max_dmg_dealt) {
+                    max_dmg_dealt = match["total_damage_dealt"];
+                }
+                if (match["total_damage_taken"] < min_dmg_taken) {
+                    min_dmg_taken = match["total_damage_taken"];
+                } else if (match["total_damage_taken"] > max_dmg_taken) {
+                    max_dmg_taken = match["total_damage_taken"];
+                }
             }
         });
 
