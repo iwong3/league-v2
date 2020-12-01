@@ -3,3 +3,8 @@
 
 # env vars
 .env
+
+# python
+__pycache__/
+*.pyo
+*.pyc
