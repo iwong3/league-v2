@@ -30,7 +30,7 @@ export default class Home extends Component {
         return (
             <div className="home">
                 <h1>league-v2 - league analytics</h1>
-                <DmgScatterplot/>
+                { this.state.match_data.length ? <DmgScatterplot match_data={this.state.match_data}/> : <none/> }
                 { this.state.match_data.length ? <ChampWinBar match_data={this.state.match_data}/> : <none/> }
             </div>
         );

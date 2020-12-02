@@ -3,7 +3,7 @@ import { Component } from 'react';
 import * as d3 from "d3";
 
 
-export default class ChampWinBar extends Component {
+export default class ChampKpBar extends Component {
 
     constructor(props) {
         super(props);
@@ -153,7 +153,7 @@ export default class ChampWinBar extends Component {
 
     render() {
         return (
-            <div className="champ-win-bar"/>
+            <div className="champ-kp-bar"/>
         );
     }
 

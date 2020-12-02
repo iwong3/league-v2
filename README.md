@@ -6,7 +6,7 @@
 - items vs. avg win rate
 - items vs. avg win time
 - champions vs. avg types of damage dealt
-- champiopns vs. time ccing others
+- champions vs. time ccing others
 - champions vs. wards placed
 - champions vs. runes
 - runes vs. avg win rate
@@ -16,6 +16,7 @@
 - champions vs. killing sprees
 - champions vs. time alive
 - scatterplot - dmg dealt vs. dmg taken, dots = green/red, win/loss
+- champions vs. kill participation
 
 ### ML IDEAS
 - Win/loss (and time?) predictions based on kda/items/champs/runes
@@ -34,6 +35,16 @@
     - Dynamic graph titles/labels
 
 ### IMMEDIATE NEXT STEPS
-- all `__pycache__` to `.gitignore`
-- update `/match` endpoint response to have meaningful values (mappings)
-- set up basic d3 visualization
+- data issues
+    - think of all the different interesting graphs to make and what data you'll need
+    - fix db columns
+    - fix scripts to populate db
+    - run script to populate
+    - fix backend endpoints if needed
+    - TODO: champ bans fixed & team totals added - need to re-create table and run scripts ONCE data is more set
+- created champ kp bar class but just copied - need to implement once team totals is added
+- think about website purpose & design
+    - champion/win graphs
+        - a lot of visualizations could be shown in 1 graph w/ user selecting x/y
+    - champion page w/ champ stats
+    - ML page (win/loss predictor, champ predictor)

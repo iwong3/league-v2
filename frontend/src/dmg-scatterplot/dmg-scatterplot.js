@@ -15,12 +15,9 @@ export default class DmgScatterplot extends Component {
     }
 
     componentDidMount() {
-        const match_url = "http://localhost:5000/match";
-        axios.get(match_url).then(resp => {
-            this.setState({
-                match_data: resp.data
-            });
-        }).then(resp => {
+        this.setState({
+            match_data: this.props.match_data
+        }, function(d) {
             this.renderScatterplot();
         });
     }

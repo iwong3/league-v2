@@ -107,13 +107,26 @@ def get_matches(summoner_name):
             match_team_sql = (
                 "INSERT INTO {} "
                 "(match_id, team_id, win,"
+                " total_kills, total_deaths, total_assists"
                 " first_blood, first_baron, first_dragon, first_inhibitor, first_rift_herald, first_tower,"
                 " baron_kills, dragon_kills, inhibitor_kills, rift_herald_kills, tower_kills,"
                 " champion_ban_1, champion_ban_2, champion_ban_3, champion_ban_4, champion_ban_5)"
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)".format(constants.MATCH_TEAM_TABLE_NAME)
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)".format(constants.MATCH_TEAM_TABLE_NAME)
             )
             # one for each team in match
-            for team in match_response_data["teams"]:
+            for team in match_response_data.get("teams"):
+                # set up total team kills/deaths/assists
+                curr_team_id = team.get("teamId")
+                total_kills, total_deaths, total_assists = 0, 0, 0
+                for participant in match_response_data.get("participants"):
+                    if curr_team_id == participant.get("teamId"):
+                        curr_player_stats = participant.get("stats")
+                        if curr_player_stats == None:
+                            continue
+                        total_kills += participant.get("kills")
+                        total_deaths += participant.get("deaths")
+                        total_assists += participant.get("assists")
+
                 # set up bans
                 bans = team.get("bans")
                 ban1, ban2, ban3, ban4, ban5 = None, None, None, None, None
@@ -127,7 +140,8 @@ def get_matches(summoner_name):
 
                 try:
                     cursor.execute(match_team_sql, (
-                        curr_match_id, team.get("teamId"), team.get("win"),
+                        curr_match_id, curr_team_id, team.get("win"),
+                        total_kills, total_assists, total_deaths,
                         team.get("firstBlood"), team.get("firstBaron"), team.get("firstDragon"),
                         team.get("firstInhibitor"), team.get("firstRiftHerald"), team.get("firstTower"),
                         team.get("baronKills"), team.get("dragonKills"), team.get("inhibitorKills"),
