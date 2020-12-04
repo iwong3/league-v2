@@ -4,8 +4,12 @@ from ratelimit import limits, sleep_and_retry
 import os
 import requests
 import sqlite3
+import time
 
-from constants import constants
+# hack to import from outside of /data folder (b/c we have everything in one repo)
+import sys
+sys.path.append("../")
+from utility import constants
 
 
 # load env vars
@@ -22,11 +26,12 @@ MATCH_BY_ID_PATH = "/lol/match/v4/matches/"
 # requests
 request_headers = { "X-Riot-Token": RIOT_API_KEY }
 # rate limiting
-RATE_LIMIT_CALLS = 90
+RATE_LIMIT_CALLS = 80
 RATE_LIMIT_DURATION = 120 # 2 minutes
 
 # db constants
-MAX_MATCHES_TO_INSERT = 1000
+MAX_MATCHES_TO_INSERT = 10000
+REPOPULATE_FLAG = False
 
 # for printing calls
 count = 1
@@ -66,15 +71,22 @@ def get_matches(summoner_name):
         # get matchlist
         account_id = account_ids.pop()
         matchlist_request_url = NA_ENDPOINT + MATCHLIST_BY_ACCOUNT_PATH + account_id
-        matchlist_response_data = call_api(matchlist_request_url, request_headers).json()
+        matchlist_response_data = call_api(matchlist_request_url, request_headers)
+        if matchlist_response_data == None or matchlist_response_data.json().get("matches") == None:
+            matchlist = []
+        else:
+            matchlist = matchlist_response_data.json().get("matches")
 
-        # add all match ids from matchlist that haven't not already been stored
-        for match in matchlist_response_data["matches"]:
+        # add all match ids from matchlist that haven't not already been stored, unless re-populating
+        for match in matchlist:
             match_id = match["gameId"]
-            cursor.execute("SELECT id FROM {} WHERE id = ?".format(constants.MATCH_TABLE_NAME), (match_id,))
-            data = cursor.fetchone()
-            if data is None:
+            if REPOPULATE_FLAG:
                 match_ids.append(match_id)
+            else:
+                cursor.execute("SELECT id FROM {} WHERE id = ?".format(constants.MATCH_TABLE_NAME), (match_id,))
+                data = cursor.fetchone()
+                if data is None:
+                    match_ids.append(match_id)
 
         # for all match ids
         while len(match_ids) > 0 and matches_inserted < MAX_MATCHES_TO_INSERT:
@@ -107,7 +119,7 @@ def get_matches(summoner_name):
             match_team_sql = (
                 "INSERT INTO {} "
                 "(match_id, team_id, win,"
-                " total_kills, total_deaths, total_assists"
+                " total_kills, total_deaths, total_assists,"
                 " first_blood, first_baron, first_dragon, first_inhibitor, first_rift_herald, first_tower,"
                 " baron_kills, dragon_kills, inhibitor_kills, rift_herald_kills, tower_kills,"
                 " champion_ban_1, champion_ban_2, champion_ban_3, champion_ban_4, champion_ban_5)"
@@ -121,11 +133,10 @@ def get_matches(summoner_name):
                 for participant in match_response_data.get("participants"):
                     if curr_team_id == participant.get("teamId"):
                         curr_player_stats = participant.get("stats")
-                        if curr_player_stats == None:
-                            continue
-                        total_kills += participant.get("kills")
-                        total_deaths += participant.get("deaths")
-                        total_assists += participant.get("assists")
+                        if curr_player_stats:
+                            total_kills += curr_player_stats.get("kills")
+                            total_deaths += curr_player_stats.get("deaths")
+                            total_assists += curr_player_stats.get("assists")
 
                 # set up bans
                 bans = team.get("bans")
@@ -246,7 +257,15 @@ def call_api(url, headers):
 
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
-        raise Exception(url, "failed with", response.status_code)
+        # account id not found - probably old match and account id had been regenerated
+        if response.status_code == 404 and MATCHLIST_BY_ACCOUNT_PATH in url:
+            return None
+        # try one more time after waiting on 503/504
+        if response.status_code == 503 or response.status_code == 504:
+            time.sleep(5)
+            response = requests.get(url, headers=headers)
+        else:
+            raise Exception(url, "failed with", response.status_code)
 
     print("Call",count)
     count += 1
@@ -255,4 +274,4 @@ def call_api(url, headers):
 
 
 if __name__ == "__main__":
-    get_matches("Jhun")
+    get_matches("TSM Spica")

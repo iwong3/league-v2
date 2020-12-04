@@ -48,3 +48,6 @@
         - a lot of visualizations could be shown in 1 graph w/ user selecting x/y
     - champion page w/ champ stats
     - ML page (win/loss predictor, champ predictor)
+    - maybe a homepage with scrollable cool data? then a header at the top to manually explore different features
+        - most interesting findings on homepage in a cool, scrollable, presentable format
+        - header w/ tabs for manually exploring (graphs, champ stats, ML)

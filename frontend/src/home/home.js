@@ -18,7 +18,7 @@ export default class Home extends Component {
     }
 
     componentDidMount() {
-        const match_url = "http://localhost:5000/match";
+        const match_url = "http://localhost:5000/match?limit=5000";
         axios.get(match_url).then(resp => {
             this.setState({
                 match_data: resp.data
