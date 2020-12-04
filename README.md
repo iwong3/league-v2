@@ -17,6 +17,7 @@
 - champions vs. time alive
 - scatterplot - dmg dealt vs. dmg taken, dots = green/red, win/loss
 - champions vs. kill participation
+- team totals
 
 ### ML IDEAS
 - Win/loss (and time?) predictions based on kda/items/champs/runes

@@ -120,23 +120,93 @@ def get_matches(summoner_name):
                 "INSERT INTO {} "
                 "(match_id, team_id, win,"
                 " total_kills, total_deaths, total_assists,"
+                " total_physical_damage_dealt, total_magic_damage_dealt, total_true_damage_dealt, total_damage_dealt,"
+                " total_physical_damage_dealt_to_champions, total_magic_damage_dealt_to_champions,"
+                " total_true_damage_dealt_to_champions, total_damage_dealt_to_champions,"
+                " total_physical_damage_taken, total_magic_damage_taken, total_true_damage_taken, total_damage_taken,"
+                " total_damage_self_mitigated,"
+                " total_heal,"
+                " total_minions_killed, total_neutral_minions_killed,"
+                " total_neutral_minions_killed_team_jungle, total_neutral_minions_killed_enemy_jungle,"
+                " total_time_crowd_control_dealt, total_time_ccing_others,"
+                " total_damage_dealt_to_turrets, total_damage_dealt_to_objectives,"
+                " total_gold_earned, total_gold_spent,"
+                " total_vision_score, total_vision_wards_bought_in_game, total_wards_killed, total_wards_placed,"
                 " first_blood, first_baron, first_dragon, first_inhibitor, first_rift_herald, first_tower,"
                 " baron_kills, dragon_kills, inhibitor_kills, rift_herald_kills, tower_kills,"
                 " champion_ban_1, champion_ban_2, champion_ban_3, champion_ban_4, champion_ban_5)"
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)".format(constants.MATCH_TEAM_TABLE_NAME)
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)".format(constants.MATCH_TEAM_TABLE_NAME)
             )
             # one for each team in match
             for team in match_response_data.get("teams"):
-                # set up total team kills/deaths/assists
+                # set up team totals
                 curr_team_id = team.get("teamId")
+                # kda
                 total_kills, total_deaths, total_assists = 0, 0, 0
+                # dmg dealt/taken
+                total_physical_damage_dealt, total_magic_damage_dealt, total_true_damage_dealt, total_damage_dealt = 0, 0, 0, 0
+                total_physical_damage_dealt_to_champions, total_magic_damage_dealt_to_champions = 0, 0
+                total_true_damage_dealt_to_champions, total_damage_dealt_to_champions = 0, 0
+                total_physical_damage_taken, total_magic_damage_taken, total_true_damage_taken, total_damage_taken = 0, 0, 0, 0
+                total_damage_self_mitigated = 0
+                # healing
+                total_heal = 0
+                # cs
+                total_minions_killed, total_neutral_minions_killed = 0, 0
+                total_neutral_minions_killed_team_jungle, total_neutral_minions_killed_enemy_jungle = 0, 0
+                # cc
+                total_time_crowd_control_dealt, total_time_ccing_others = 0, 0
+                # objectives
+                total_damage_dealt_to_turrets, total_damage_dealt_to_objectives = 0, 0
+                # gold
+                total_gold_earned, total_gold_spent = 0, 0
+                # vision & wards
+                total_vision_score, total_vision_wards_bought_in_game, total_wards_killed, total_wards_placed = 0, 0, 0, 0
+
                 for participant in match_response_data.get("participants"):
                     if curr_team_id == participant.get("teamId"):
                         curr_player_stats = participant.get("stats")
                         if curr_player_stats:
+                            # kda
                             total_kills += curr_player_stats.get("kills")
                             total_deaths += curr_player_stats.get("deaths")
                             total_assists += curr_player_stats.get("assists")
+                            # dmg dealt/taken
+                            total_physical_damage_dealt += curr_player_stats.get("physicalDamageDealt")
+                            total_magic_damage_dealt += curr_player_stats.get("magicDamageDealt")
+                            total_true_damage_dealt += curr_player_stats.get("trueDamageDealt")
+                            total_damage_dealt += curr_player_stats.get("totalDamageDealt")
+                            total_physical_damage_dealt_to_champions += curr_player_stats.get("physicalDamageDealtToChampions")
+                            total_magic_damage_dealt_to_champions += curr_player_stats.get("magicDamageDealtToChampions")
+                            total_true_damage_dealt_to_champions += curr_player_stats.get("trueDamageDealtToChampions")
+                            total_damage_dealt_to_champions += curr_player_stats.get("totalDamageDealtToChampions")
+                            total_physical_damage_taken += curr_player_stats.get("physicalDamageTaken")
+                            total_magic_damage_taken += curr_player_stats.get("magicalDamageTaken")
+                            total_true_damage_taken += curr_player_stats.get("trueDamageTaken")
+                            total_damage_taken += curr_player_stats.get("totalDamageTaken")
+                            total_damage_self_mitigated += curr_player_stats.get("damageSelfMitigated")
+                            # healing
+                            total_heal += curr_player_stats.get("totalHeal")
+                            # cs
+                            total_minions_killed += curr_player_stats.get("totalMinionsKilled")
+                            total_neutral_minions_killed += curr_player_stats.get("neutralMinionsKilled")
+                            total_neutral_minions_killed_team_jungle += zero_if_none(curr_player_stats.get("neutralMinionsKilledTeamJungle"))
+                            total_neutral_minions_killed_enemy_jungle += zero_if_none(curr_player_stats.get("neutralMinionsKilledEnemyJungle"))
+                            # cc
+                            total_time_crowd_control_dealt += curr_player_stats.get("totalTimeCrowdControlDealt")
+                            total_time_ccing_others += curr_player_stats.get("timeCCingOthers")
+                            # objectives
+                            total_damage_dealt_to_turrets += curr_player_stats.get("damageDealtToTurrets")
+                            total_damage_dealt_to_objectives += curr_player_stats.get("damageDealtToObjectives")
+                            # gold
+                            total_gold_earned += curr_player_stats.get("goldEarned")
+                            total_gold_spent += curr_player_stats.get("goldSpent")
+                            # vision & wards
+                            total_vision_score += curr_player_stats.get("visionScore")
+                            total_vision_wards_bought_in_game += curr_player_stats.get("visionWardsBoughtInGame")
+                            total_wards_killed += zero_if_none(curr_player_stats.get("wardsKilled"))
+                            total_wards_placed += zero_if_none(curr_player_stats.get("wardsPlaced"))
 
                 # set up bans
                 bans = team.get("bans")
@@ -153,6 +223,18 @@ def get_matches(summoner_name):
                     cursor.execute(match_team_sql, (
                         curr_match_id, curr_team_id, team.get("win"),
                         total_kills, total_assists, total_deaths,
+                        total_physical_damage_dealt, total_magic_damage_dealt, total_true_damage_dealt, total_damage_dealt,
+                        total_physical_damage_dealt_to_champions, total_magic_damage_dealt_to_champions,
+                        total_true_damage_dealt_to_champions, total_damage_dealt_to_champions,
+                        total_physical_damage_taken, total_magic_damage_taken, total_true_damage_taken, total_damage_taken,
+                        total_damage_self_mitigated,
+                        total_heal,
+                        total_minions_killed, total_neutral_minions_killed,
+                        total_neutral_minions_killed_team_jungle, total_neutral_minions_killed_enemy_jungle,
+                        total_time_crowd_control_dealt, total_time_ccing_others,
+                        total_damage_dealt_to_turrets, total_damage_dealt_to_objectives,
+                        total_gold_earned, total_gold_spent,
+                        total_vision_score, total_vision_wards_bought_in_game, total_wards_killed, total_wards_placed,
                         team.get("firstBlood"), team.get("firstBaron"), team.get("firstDragon"),
                         team.get("firstInhibitor"), team.get("firstRiftHerald"), team.get("firstTower"),
                         team.get("baronKills"), team.get("dragonKills"), team.get("inhibitorKills"),
@@ -272,6 +354,16 @@ def call_api(url, headers):
 
     return response
 
+# helper method to check for nonetype and return zero
+# some response fields aren't available in arams
+def zero_if_none(data):
+    if data is None:
+        return 0
+    return data
 
+
+# some names
+# Smackadummy, Vivilyn, Khayame, Ricefoxx, Faliteran
+# Yiliang Peng, SentientAI, ASTROBOY99, Spica1, TSM Spica
 if __name__ == "__main__":
-    get_matches("TSM Spica")
+    get_matches("Jhun")
