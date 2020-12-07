@@ -36,6 +36,14 @@
     - Dynamic graph titles/labels
 
 ### IMMEDIATE NEXT STEPS
+- update MatchTeamScatterplot
+    - show and update axis labels properly
+    - limit which fields are available in selector, logic for various fields
+    - on hover interactive graph functionality
+- create MatchParticipantsScatterplot
+- create nicer ui for above 2 graphs
+    - look up design
+    - league colors
 - data issues
     - think of all the different interesting graphs to make and what data you'll need
     - fix db columns
@@ -43,7 +51,6 @@
     - run script to populate
     - fix backend endpoints if needed
     - TODO: champ bans fixed & team totals added - need to re-create table and run scripts ONCE data is more set
-- created champ kp bar class but just copied - need to implement once team totals is added
 - think about website purpose & design
     - champion/win graphs
         - a lot of visualizations could be shown in 1 graph w/ user selecting x/y

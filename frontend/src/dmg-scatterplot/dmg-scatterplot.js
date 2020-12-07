@@ -10,13 +10,13 @@ export default class DmgScatterplot extends Component {
         super(props);
 
         this.state = {
-            match_data: []
+            match_participants_data: []
         }
     }
 
     componentDidMount() {
         this.setState({
-            match_data: this.props.match_data
+            match_participants_data: this.props.match_participants_data
         }, function(d) {
             this.renderScatterplot();
         });
@@ -39,7 +39,7 @@ export default class DmgScatterplot extends Component {
         let max_dmg_dealt = 0;
         let min_dmg_taken = Number.MAX_SAFE_INTEGER;
         let max_dmg_taken = 0;
-        this.state.match_data.forEach(function(match) {
+        this.state.match_participants_data.forEach(function(match) {
             // skip matches that aren't summoner's rift
             if (match["map_id"] === 11) {
                 // create and add scatterplot data

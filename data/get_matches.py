@@ -27,7 +27,7 @@ MATCH_BY_ID_PATH = "/lol/match/v4/matches/"
 request_headers = { "X-Riot-Token": RIOT_API_KEY }
 # rate limiting
 RATE_LIMIT_CALLS = 80
-RATE_LIMIT_DURATION = 120 # 2 minutes
+RATE_LIMIT_DURATION = 150 # 2.5 minutes
 
 # db constants
 MAX_MATCHES_TO_INSERT = 10000
@@ -366,4 +366,4 @@ def zero_if_none(data):
 # Smackadummy, Vivilyn, Khayame, Ricefoxx, Faliteran
 # Yiliang Peng, SentientAI, ASTROBOY99, Spica1, TSM Spica
 if __name__ == "__main__":
-    get_matches("Jhun")
+    get_matches("ASTROBOY99")

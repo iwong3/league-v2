@@ -9,13 +9,13 @@ export default class ChampKpBar extends Component {
         super(props);
 
         this.state = {
-            match_data: []
+            match_participants_data: []
         }
     }
 
     componentDidMount() {
         this.setState({
-            match_data: this.props.match_data
+            match_participants_data: this.props.match_participants_data
         }, function(d) {
             this.renderBarGraph();
         });
@@ -23,7 +23,7 @@ export default class ChampKpBar extends Component {
 
     renderBarGraph() {
 
-        console.log(this.state.match_data);
+        console.log(this.state.match_participants_data);
 
         // constants
         const width = window.innerWidth * 0.8;
@@ -35,7 +35,7 @@ export default class ChampKpBar extends Component {
 
         // get bar graph data
         let champion_win_data = {};
-        this.state.match_data.forEach(function(match) {
+        this.state.match_participants_data.forEach(function(match) {
             // skip matches that aren't summoner's rift
             if (match["map_id"] === 11) {
                 const champ_name = match["champion_name"];
