@@ -37,9 +37,7 @@ export default class Home extends Component {
         return (
             <div className="home">
                 <h1>league-v2 - league analytics</h1>
-                { this.state.match_participants_data.length ? <DmgScatterplot match_participants_data={this.state.match_participants_data}/> : <none/> }
                 { this.state.match_teams_data.length ? <MatchTeamScatterplot match_teams_data={this.state.match_teams_data}/> : <none/> }
-                { this.state.match_participants_data.length ? <ChampWinBar match_participants_data={this.state.match_participants_data}/> : <none/> }
             </div>
         );
     }

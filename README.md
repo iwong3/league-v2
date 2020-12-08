@@ -44,6 +44,8 @@
 - create nicer ui for above 2 graphs
     - look up design
     - league colors
+- graphs of deltas (winning teams had 'x' more cs/kda/etc)
+    - calculate at backend?
 - data issues
     - think of all the different interesting graphs to make and what data you'll need
     - fix db columns

@@ -2,6 +2,9 @@ import { Component } from 'react';
 
 import * as d3 from 'd3';
 
+import * as map from '../utility/maps/graph-fields.js';
+
+
 
 export default class MatchTeamScatterplot extends Component {
 
@@ -67,8 +70,8 @@ export default class MatchTeamScatterplot extends Component {
             return scatterplot_data;
         }
 
-        let curr_x = "total_damage_dealt_to_champions";
-        let curr_y = "total_time_ccing_others"
+        let curr_x = "total_kills";
+        let curr_y = "total_deaths"
         let scatterplot_data = getScatterplotData(curr_x, curr_y);
         const min_x = scatterplot_data["min_x"];
         const max_x = scatterplot_data["max_x"];
@@ -76,23 +79,31 @@ export default class MatchTeamScatterplot extends Component {
         const max_y = scatterplot_data["max_y"];
         scatterplot_data = scatterplot_data["data"];
 
-        // fields
-        const fields = Object.keys(this.state.match_teams_data[0])
+        // set up fields
+        let fields = []
+        const match_team_fields = map.graph_field_mappings["match_team_fields"];
+        for (let field in match_team_fields) {
+            if (match_team_fields[field]["type"] === "continuous") {
+                fields.push(match_team_fields[field]["field"])
+            }
+        }
 
         // field selectors
         d3.select("#x-axis-selector")
             .selectAll("x-axis-options")
             .data(fields).enter()
             .append("option")
-            .text(function(d) { return d; })
-            .attr("value", function(d) { return d; });
+            .text(function(d) { return map.getFieldTitle(d); })
+            .attr("value", function(d) { return d; })
+            .property("selected", function(d) { return d === curr_x; });
 
         d3.select("#y-axis-selector")
             .selectAll("y-axis-options")
             .data(fields).enter()
             .append("option")
-            .text(function(d) { return d; })
-            .attr("value", function(d) { return d; });
+            .text(function(d) { return map.getFieldTitle(d); })
+            .attr("value", function(d) { return d; })
+            .property("selected", function(d) { return d === curr_y; });
 
         // svg
         let svg = d3.select(".match-team-scatterplot").append("svg")
@@ -122,7 +133,7 @@ export default class MatchTeamScatterplot extends Component {
             .attr("text-anchor", "middle")
             .attr("x", width / 2)
             .attr("y", height - margin)
-            .text("Neutral Minions Killed (CS)");
+            .text(map.getFieldTitle(curr_x));
 
         // y axis
         const y_axis = d3.axisLeft(y_scale);
@@ -132,12 +143,12 @@ export default class MatchTeamScatterplot extends Component {
             .call(y_axis);
 
         let y_axis_title = svg.append("text")
-            .append("class", "label")
+            .attr("class", "label")
             .attr("text-anchor", "middle")
             .attr("x", -(height) / 2)
             .attr("y", margin)
             .attr("transform", "rotate(-90)")
-            .text("Time CCing Others");
+            .text(map.getFieldTitle(curr_y));
 
         // dot styling
         const dot_radius = 5;
@@ -202,9 +213,16 @@ export default class MatchTeamScatterplot extends Component {
             x_scale.domain([min_x, max_x]);
             y_scale.domain([min_y, max_y]);
 
+            // update axis
+            const updated_x_axis = d3.axisBottom(x_scale);
+            svg.selectAll("g.x.axis").transition().duration(1000).call(updated_x_axis);
+            const updated_y_axis = d3.axisLeft(y_scale);
+            svg.selectAll("g.y.axis").call(updated_y_axis);
+
+
             // update axis titles
-            x_axis_title.text(x_field);
-            y_axis_title.text(y_field);
+            x_axis_title.text(map.getFieldTitle(x_field));
+            y_axis_title.text(map.getFieldTitle(y_field));
 
             // update dots
             dots.data(scatterplot_data)
