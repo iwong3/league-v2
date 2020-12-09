@@ -1,0 +1,65 @@
+#match-team-scatterplot {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#match-team-scatterplot-menu {
+    display: flex;
+    justify-content: center;
+    height: 10%;
+}
+
+#match-team-scatterplot-menu select {
+    margin: 0% 2.5%;
+    padding: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.25em;
+}
+
+g.x.axis, g.y.axis {
+    font-family:'Courier New', Courier, monospace;
+    font-size: 1em;
+}
+
+.axis.title {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 2em;
+}
+
+.match-team-scatterplot-tooltip {
+    padding: 0.5em 0.75em;
+    border: 5px solid;
+    border-radius: 10px;
+    border-color: #fff;
+    background-color: #111;
+    color: #fff;
+}
+
+.match-team-scatterplot-tooltip p {
+    margin: 0;
+    font-size: 1.15em;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* tooltip chevron */
+.match-team-scatterplot-tooltip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 1em;
+    width: 100%;
+    line-height: 5;
+    color: rgba(0, 0, 0, 0.8);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+}
+
+#crosshair {
+    fill: none;
+    stroke-width: 1px;
+}
+
+#crosshair-x, #crosshair-y {
+    stroke: #FFD166;
+}

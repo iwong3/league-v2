@@ -44,6 +44,7 @@
 - create nicer ui for above 2 graphs
     - look up design
     - league colors
+    - axis selectors - use list for styling? https://codepen.io/marijoha/pen/zKjvEw
 - graphs of deltas (winning teams had 'x' more cs/kda/etc)
     - calculate at backend?
 - data issues
