@@ -36,11 +36,8 @@
     - Dynamic graph titles/labels
 
 ### IMMEDIATE NEXT STEPS
-- update MatchTeamScatterplot
-    - show and update axis labels properly
-    - limit which fields are available in selector, logic for various fields
-    - on hover interactive graph functionality
 - create MatchParticipantsScatterplot
+- create same scatterplots for team/participants with deltas / means / other cool stats
 - create nicer ui for above 2 graphs
     - look up design
     - league colors
