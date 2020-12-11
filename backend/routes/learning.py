@@ -86,9 +86,13 @@ def get_champ_prediction():
 
     # populate learning data
     for row in rows:
+        # normalize by avg stats per 10 mins
+        game_duration = row[1]
+        per_10 = game_duration / (60 * 10)
         curr_data = list(row[3:])
-        curr_data.append(row[2])
-        training_data.append(curr_data)
+        curr_data_norm = [x / per_10 for x in curr_data]
+        curr_data_norm.append(row[2])
+        training_data.append(curr_data_norm)
 
     # keep 10% of data for testing
     num_test = floor(int(limit) / 10)
@@ -115,8 +119,8 @@ def get_champ_prediction():
     num_labels = len(test_labels)
     for i in range(num_labels):
         res["predictions"].append({
-            "actual": test_labels[i],
-            "prediction": predicted_champs[i]
+            "actual": map_util.get_champion_name(test_labels[i]),
+            "prediction": map_util.get_champion_name(int(predicted_champs[i]))
         })
         if test_labels[i] == predicted_champs[i]:
             num_right += 1
