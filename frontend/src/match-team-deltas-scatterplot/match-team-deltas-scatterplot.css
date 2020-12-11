@@ -1,0 +1,52 @@
+#match-team-deltas-scatterplot {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#match-team-deltas-scatterplot-menu {
+    display: flex;
+    justify-content: center;
+    height: 10%;
+}
+
+#match-team-deltas-scatterplot-menu select {
+    margin: 0% 2.5%;
+    padding: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.25em;
+}
+
+g.x.axis, g.y.axis {
+    font-family:'Courier New', Courier, monospace;
+    font-size: 1em;
+}
+
+.axis.title {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 2em;
+}
+
+.match-team-deltas-scatterplot-tooltip {
+    padding: 0.5em 0.75em;
+    border: 5px solid;
+    border-radius: 10px;
+    border-color: #fff;
+    background-color: #111;
+    color: #fff;
+}
+
+.match-team-deltas-scatterplot-tooltip p {
+    margin: 0;
+    font-size: 1.15em;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#crosshair {
+    fill: none;
+    stroke-width: 1px;
+}
+
+#crosshair-x, #crosshair-y {
+    stroke: #FFD166;
+}

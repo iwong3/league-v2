@@ -1,10 +1,10 @@
 // constants and helper functions for graph field mappings
 
-// get field title from field name
-export function getFieldTitle(field_name) {
-    for (let field in graph_field_mappings["match_team_fields"]) {
-        if (graph_field_mappings["match_team_fields"][field]["field"] === field_name) {
-            return graph_field_mappings["match_team_fields"][field]["title"];
+// get field title given mapping name and field name
+export function getFieldTitle(mapping_name, field_name) {
+    for (let field in graph_field_mappings[mapping_name]) {
+        if (graph_field_mappings[mapping_name][field]["field"] === field_name) {
+            return graph_field_mappings[mapping_name][field]["title"];
         }
     }
     return "";
@@ -261,6 +261,203 @@ export const graph_field_mappings = {
             "field": "champion_ban_1",
             "title": "Ban 5",
             "type": "category"
+        }
+    ],
+    "match_team_delta_fields": [
+        {
+            "field": "match_id",
+            "title": "Match ID",
+            "type": "id"
+        },
+        {
+            "field": "team_id",
+            "title": "Team ID",
+            "type": "category"
+        },
+        {
+            "field": "win",
+            "title": "Win",
+            "type": "category"
+        },
+        {
+            "field": "total_kills_delta",
+            "title": "Total Kills Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_deaths_delta",
+            "title": "Total Deaths Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_assists_delta",
+            "title": "Total Assists Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_physical_damage_dealt_delta",
+            "title": "Total Physical Damage Dealt Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_magic_damage_dealt_delta",
+            "title": "Total Magic Damage Dealt Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_true_damage_dealt_delta",
+            "title": "Total True Damage Dealt Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_damage_dealt_delta",
+            "title": "Total Damage Dealt Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_physical_damage_dealt_to_champions_delta",
+            "title": "Total Physical Damage Dealt to Champions Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_magic_damage_dealt_to_champions_delta",
+            "title": "Total Magic Damage Dealt to Champions Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_true_damage_dealt_to_champions_delta",
+            "title": "Total True Damage Dealt to Champions Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_damage_dealt_to_champions_delta",
+            "title": "Total Damage Dealt to Champions Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_physical_damage_taken_delta",
+            "title": "Total Physical Damage Taken Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_magic_damage_taken_delta",
+            "title": "Total Magic Damage Taken Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_true_damage_taken_delta",
+            "title": "Total True Damage Taken Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_damage_taken_delta",
+            "title": "Total Damage Taken Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_damage_self_mitigated_delta",
+            "title": "Total Damage Self Mitigated Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_heal_delta",
+            "title": "Total Healing Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_minions_killed_delta",
+            "title": "Total Minions Killed Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_neutral_minions_killed_delta",
+            "title": "Total Neutral Minions Killed Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_neutral_minions_killed_team_jungle_delta",
+            "title": "Total Neutral Minions Killed in Team Jungle Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_neutral_minions_killed_enemy_jungle_delta",
+            "title": "Total Neutral Minions Killed in Enemy Jungle Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_time_crowd_control_dealt_delta",
+            "title": "Total Time CC Dealt Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_time_ccing_others_delta",
+            "title": "Total Time CCing Champions Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_damage_dealt_to_turrets_delta",
+            "title": "Total Damage Dealt to Turrets Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_damage_dealt_to_objectives_delta",
+            "title": "Total Damage Dealt to Objectives Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_gold_earned_delta",
+            "title": "Total Gold Earned Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_gold_spent_delta",
+            "title": "Total Gold Spent Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_vision_score_delta",
+            "title": "Total Vision Score Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_vision_wards_bought_in_game_delta",
+            "title": "Total Vision Wards Bought in Game Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_wards_killed_delta",
+            "title": "Total Wards Killed Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "total_wards_placed_delta",
+            "title": "Total Wards Placed Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "baron_kills_delta",
+            "title": "Baron Kills Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "dragon_kills_delta",
+            "title": "Dragon Kills Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "inhibitor_kills_delta",
+            "title": "Inhibitor Kills Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "rift_herald_kills_delta",
+            "title": "Rift Herald Kills Delta",
+            "type": "continuous"
+        },
+        {
+            "field": "tower_kills_delta",
+            "title": "Tower Kills Delta",
+            "type": "continuous"
         }
     ]
 }
