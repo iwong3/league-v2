@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
+from math import floor
 
 import json
 import os
@@ -9,6 +10,7 @@ import sys
 import time
 
 from utility import constants, map_util, sqlite_util
+from backend.process import random_forests
 
 
 # flask setup
@@ -22,10 +24,10 @@ DEFAULT_MAP_ID = 11
 def get_blueprint():
     return learning_bp
 
-@learning_bp.route('/learning/team-win-prediction', methods=['GET'])
-def get_team_win_prediction():
+@learning_bp.route('/learning/champ-prediction', methods=['GET'])
+def get_champ_prediction():
 
-    print("/learning/team-win-predicton endpoint hit")
+    print("/learning/champ-predicton endpoint hit")
 
     # read request args
     limit = request.args.get("limit", DEFAULT_ROW_LIMIT)
@@ -41,17 +43,27 @@ def get_team_win_prediction():
     }
 
     # get query results
+    sql2 = (
+        "SELECT * FROM Match LIMIT {}"
+    ).format(limit)
     sql = (
-        "SELECT m.id, mp.champion_id, mp.spell_1_id, mp.spell_2_id, "
-        "mp.perk_0, mp.perk_1, mp.perk_2, mp.perk_3, mp.perk_4, mp.perk_5, "
-        "mp.stat_perk_0, mp.stat_perk_1, mp.stat_perk_2, mp.win "
+        "SELECT m.id, m.game_duration, mp.champion_id, "
+        "mp.kills, mp.deaths, mp.assists, mp.total_minions_killed, "
+        "mp.physical_damage_dealt, mp.magic_damage_dealt, mp.true_damage_dealt, mp.total_damage_dealt, "
+        "mp.physical_damage_dealt_to_champions, mp.magic_damage_dealt_to_champions, "
+        "mp.true_damage_dealt_to_champions, mp.total_damage_dealt_to_champions, mp.largest_critical_strike, "
+        "mp.physical_damage_taken, mp.magic_damage_taken, mp.true_damage_taken, mp.total_damage_taken, "
+        "mp.damage_self_mitigated, mp.total_heal, mp.total_units_healed, "
+        "mp.neutral_minions_killed, mp.neutral_minions_killed_team_jungle, mp.neutral_minions_killed_enemy_jungle, "
+        "mp.total_time_crowd_control_dealt, mp.time_ccing_others, "
+        "mp.gold_earned, mp.gold_spent, mp.vision_score "
         "FROM {} AS m "
         "INNER JOIN {} AS mp "
         "ON m.id = mp.match_id "
-        "WHERE m.id IN "
-        "(SELECT id FROM {} ORDER BY RANDOM() LIMIT {}) "
-        "AND m.map_id = {}"
-    ).format(constants.MATCH_TABLE_NAME, constants.MATCH_PARTICIPANTS_TABLE_NAME, constants.MATCH_TABLE_NAME, limit, map_id)
+        "WHERE m.map_id = {} "
+        "ORDER BY RANDOM() "
+        "LIMIT {}"
+    ).format(constants.MATCH_TABLE_NAME, constants.MATCH_PARTICIPANTS_TABLE_NAME, map_id, limit)
     try:
         cursor.execute(sql)
         rows = cursor.fetchall()
@@ -68,66 +80,48 @@ def get_team_win_prediction():
 
     # set up training data
     training_data = []
+    curr_data = []
     attributes = []
     labels = []
-    curr_attributes = []
-    curr_match_id = rows[0][0]
-    curr_win_data = []
-    curr_lose_data = []
 
     # populate learning data
     for row in rows:
-        # new match - process previous match data and reset curr vars
-        if curr_match_id != row[0]:
-            # process win
-            while len(curr_win_data) > 0:
-                curr_participant = random.sample(curr_win_data, 1)[0]
-                for i in range(len(curr_participant)):
-                    curr_attributes.append(curr_participant[i])
-                curr_win_data.remove(curr_participant)
-            attributes.append(curr_attributes)
-            labels.append(1)
-            # process loss
-            while len(curr_lose_data) > 0:
-                curr_participant = random.sample(curr_lose_data, 1)[0]
-                for i in range(len(curr_participant)):
-                    curr_attributes.append(curr_participant[i])
-                curr_lose_data.remove(curr_participant)
-            attributes.append(curr_attributes)
-            labels.append(0)
-            # reset curr vars
-            curr_attributes = []
-            curr_match_id = row[0]
-        # record curr match participant
-        if row[-1] == 1:
-            curr_win_data.append(row)
-        else:
-            curr_lose_data.append(row)
+        curr_data = list(row[3:])
+        curr_data.append(row[2])
+        training_data.append(curr_data)
 
-    # finish populating last match
-    # process win
-    while len(curr_win_data) > 0:
-        curr_participant = random.sample(curr_win_data, 1)[0]
-        for i in range(len(curr_participant)):
-            curr_attributes.append(curr_participant[i])
-        curr_win_data.remove(curr_participant)
-    attributes.append(curr_attributes)
-    labels.append(1)
-    # process loss
-    while len(curr_lose_data) > 0:
-        curr_participant = random.sample(curr_lose_data, 1)[0]
-        for i in range(len(curr_participant)):
-            curr_attributes.append(curr_participant[i])
-        curr_lose_data.remove(curr_participant)
-    attributes.append(curr_attributes)
-    labels.append(0)
+    # keep 10% of data for testing
+    num_test = floor(int(limit) / 10)
+    test_attrs = []
+    test_labels = []
+    while num_test > 0:
+        test_data = training_data.pop()
+        test_attrs.append(test_data[:-1])
+        test_labels.append(test_data[-1])
+        num_test -= 1
 
-    # finalize training data
-    training_data.append(attributes)
-    training_data.append(labels)
+    # train random forest on training data
+    num_trees = 20
+    random_forest = random_forests.RandomForest(num_trees)
+    random_forest.bootstrapping(training_data)
+    random_forest.fitting()
 
-    print(training_data)
+    # predict on test data
+    predicted_champs = random_forest.voting(test_attrs)
 
-    # send training data to random forest
+    # calculate accuracy and predictions for res
+    res["predictions"] = []
+    num_right = 0
+    num_labels = len(test_labels)
+    for i in range(num_labels):
+        res["predictions"].append({
+            "actual": test_labels[i],
+            "prediction": predicted_champs[i]
+        })
+        if test_labels[i] == predicted_champs[i]:
+            num_right += 1
+    accuracy = float(num_right) / num_labels
 
-    return jsonify([])
+    res["accuracy"] = accuracy
+
+    return jsonify(res)
