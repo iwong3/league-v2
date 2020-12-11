@@ -1,56 +1,21 @@
 # league-v2
 
-### VISUALIZATIONS IDEAS
-- champions vs. avg win rate
-- champions vs. avg win time
-- items vs. avg win rate
-- items vs. avg win time
-- champions vs. avg types of damage dealt
-- champions vs. time ccing others
-- champions vs. wards placed
-- champions vs. runes
-- runes vs. avg win rate
-- runes vs. avg win time
-- first blood vs. avg win rate
-- first turret vs. avg win rate
-- champions vs. killing sprees
-- champions vs. time alive
-- scatterplot - dmg dealt vs. dmg taken, dots = green/red, win/loss
-- champions vs. kill participation
-- team totals
-
-### ML IDEAS
-- Win/loss (and time?) predictions based on kda/items/champs/runes
-  - this is really cool, could apply to live games and see if predictions match outcome
-- Predict champion being played based on kda/items/runes
+This app currently provides the following functionality:
+    - scatterplots for in-game stats such as kda, damage taken/given, cs, vision score, etc.
+        - at the team, team delta, participant levels
+    - basic random forest classifier to predict champion based on in-game total stats (and per10 stats)
 
 ### NEXT STEPS
-- Load more data (100,000 rows for analysis?)
-- Create backend endpoints to access db (probably can just get all data, can create queries based on functionality)
-- Backend should map values to more meaningful context
-- Create a basic visualization with d3
-- Think about meaningful front end UI, functionality (instead of showing a bunch of graphs, maybe have sections/user choice)
-  - User could filter by patch/champ/map
-- Think about data filtering for all graphs vs. per graph
-    - Could allow filtering for all graphs, but also allow per-graph filtering
-    - Dynamic graph titles/labels
-
-### IMMEDIATE NEXT STEPS
-- create MatchParticipantsScatterplot
-- create same scatterplots for team/participants with deltas / means / other cool stats
-- create nicer ui for above 2 graphs
-    - look up design
-    - league colors
+- graph ideas
+    - participants scatterplot
+    - participants per 10 scatterplot
+- graph functionality
+    - mean/mode/other cool stats
+- graph ui
     - axis selectors - use list for styling? https://codepen.io/marijoha/pen/zKjvEw
-- graphs of deltas (winning teams had 'x' more cs/kda/etc)
-    - calculate at backend?
-- data issues
-    - think of all the different interesting graphs to make and what data you'll need
-    - fix db columns
-    - fix scripts to populate db
-    - run script to populate
-    - fix backend endpoints if needed
-    - TODO: champ bans fixed & team totals added - need to re-create table and run scripts ONCE data is more set
+    - league colors
+- champ predict algo in ui
+    - create one for aram
 - think about website purpose & design
     - champion/win graphs
         - a lot of visualizations could be shown in 1 graph w/ user selecting x/y
