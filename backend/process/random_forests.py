@@ -2,6 +2,8 @@ from math import log
 
 import numpy as np
 
+from utility import constants
+
 
 # TODO
 # - predict champion based on in-game stats
@@ -43,19 +45,27 @@ class Utility(object):
 
 
     # split attributes/labels into two groups based on split attribute/value
-    def partition_classes(self, X, y, split_attr, split_val):
+    def partition_classes(self, X, y, split_attr, split_val, split_type):
 
         # set up split attributes/labels
         X_left, X_right, y_left, y_right = [], [], [], []
 
         # split on split_attribute and split_val
         for i in range(len(X)):
-            if X[i][split_attr] < split_val:
-                X_left.append(X[i])
-                y_left.append(y[i])
-            else:
-                X_right.append(X[i])
-                y_right.append(y[i])
+            if constants.DATA_TYPE_CONTINUOUS == split_type:
+                if X[i][split_attr] <= split_val:
+                    X_left.append(X[i])
+                    y_left.append(y[i])
+                else:
+                    X_right.append(X[i])
+                    y_right.append(y[i])
+            elif constants.DATA_TYPE_CATEGORICAL == split_type:
+                if X[i][split_attr] == split_val:
+                    X_left.append(X[i])
+                    y_left.append(y[i])
+                else:
+                    X_right.append(X[i])
+                    y_right.append(y[i])
 
         return (X_left, X_right, y_left, y_right)
 
@@ -80,7 +90,7 @@ class Utility(object):
 
 
     # find best split that gives most info gain
-    def best_split(self, X, y):
+    def best_split(self, X, y, data_types):
 
         # best split vars
         max_info_gain = -1.0
@@ -94,28 +104,31 @@ class Utility(object):
         # 2. randomly select columns to split on
         all_attrs = list(range(len(X[0])))
         selected_attrs = []
+        selected_attrs_types = []
         while num_attr > 0:
             random_attribute_index = np.random.randint(len(all_attrs))
             selected_attrs.append(all_attrs[random_attribute_index])
+            selected_attrs_types.append(data_types[random_attribute_index])
             all_attrs.pop(random_attribute_index)
             num_attr -= 1
 
         # 3a. get the best split from all attribute/value combinations (from cmu slides)
-        for split_attr in selected_attrs:
+        for i in range(len(selected_attrs)):
             for node in X:
                 # 3b. split on column + value
-                split_val = node[split_attr]
-                (X_left, X_right, y_left, y_right) = self.partition_classes(X, y, split_attr, split_val)
+                split_val = node[selected_attrs[i]]
+                (X_left, X_right, y_left, y_right) = self.partition_classes(X, y, selected_attrs[i], split_val, selected_attrs_types[i])
 
                 # 3c. update on max_information_gain
                 info_gain = self.info_gain(y, [y_left, y_right])
                 if info_gain > max_info_gain:
                     max_info_gain = info_gain
-                    best_split_attr = split_attr
+                    best_split_attr = selected_attrs[i]
                     best_split_val = split_val
+                    best_split_type = data_types[i]
                     best_X_left, best_X_right, best_y_left, best_y_right = X_left, X_right, y_left, y_right
 
-        return best_split_attr, best_split_val, best_X_left, best_X_right, best_y_left, best_y_right
+        return best_split_attr, best_split_val, best_split_type, best_X_left, best_X_right, best_y_left, best_y_right
 
 
     # get most common label
@@ -145,9 +158,10 @@ class Utility(object):
 class DecisionTree(object):
 
 
-    def __init__(self, max_depth):
+    def __init__(self, max_depth, data_types):
         self.tree = {}
         self.max_depth = max_depth
+        self.data_types = data_types
         self.util = Utility()
         self.curr_key = 2
         self.entropy_threshold = 0.05
@@ -176,7 +190,7 @@ class DecisionTree(object):
             if all_equal:
                 leaf = True
 
-        # create leaf if leaf
+        # create leaf
         if leaf:
             curr_node = {
                 'label': self.util.most_common_label(y)
@@ -185,7 +199,7 @@ class DecisionTree(object):
             return
 
         # split
-        split_attribute, split_value, X_left, X_right, y_left, y_right = self.util.best_split(X, y)
+        split_attribute, split_value, split_type, X_left, X_right, y_left, y_right = self.util.best_split(X, y, self.data_types)
 
         # leaf - can't split anymore
         if len(X_left) == 0 or len(X_right) == 0:
@@ -203,7 +217,8 @@ class DecisionTree(object):
             'left': left_key,
             'right': right_key,
             'split_attribute': split_attribute,
-            'split_value': split_value
+            'split_value': split_value,
+            'split_type': split_type
         }
         self.tree[key] = curr_node
 
@@ -224,10 +239,16 @@ class DecisionTree(object):
                 return curr_node['label']
 
             # split
-            if record[curr_node['split_attribute']] < curr_node['split_value']:
-                curr_key = curr_node['left']
-            else:
-                curr_key = curr_node['right']
+            if constants.DATA_TYPE_CONTINUOUS == curr_node['split_type']:
+                if record[curr_node['split_attribute']] <= curr_node['split_value']:
+                    curr_key = curr_node['left']
+                else:
+                    curr_key = curr_node['right']
+            elif constants.DATA_TYPE_CATEGORICAL == curr_node['split_type']:
+                if record[curr_node['split_attribute']] == curr_node['split_value']:
+                    curr_key = curr_node['left']
+                else:
+                    curr_key = curr_node['right']
 
 
 class RandomForest(object):
@@ -236,15 +257,17 @@ class RandomForest(object):
     decision_trees = []
     bootstraps_datasets = []
     bootstraps_labels = []
+    bootstraps_data_types = None
     util = None
 
 
     def __init__(self, num_trees):
         # Initialization done here
         self.num_trees = num_trees
-        self.decision_trees = [DecisionTree(max_depth=10) for i in range(num_trees)]
+        self.decision_trees = []
         self.bootstraps_datasets = []
         self.bootstraps_labels = []
+        self.bootstraps_data_types = None
         self.util = Utility()
 
 
@@ -266,7 +289,11 @@ class RandomForest(object):
 
 
     # prepare data for all decision trees
-    def bootstrapping(self, XX):
+    def bootstrapping(self, XX, data_types):
+
+        # create dts passing in data_types
+        self.decision_trees = [DecisionTree(max_depth=10, data_types=data_types) for i in range(self.num_trees)]
+        self.bootstraps_data_types = data_types
 
         # get bootstrapped data for each decision tree
         for i in range(self.num_trees):

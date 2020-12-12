@@ -56,7 +56,8 @@ def get_champ_prediction():
         "mp.damage_self_mitigated, mp.total_heal, mp.total_units_healed, "
         "mp.neutral_minions_killed, mp.neutral_minions_killed_team_jungle, mp.neutral_minions_killed_enemy_jungle, "
         "mp.total_time_crowd_control_dealt, mp.time_ccing_others, "
-        "mp.gold_earned, mp.gold_spent, mp.vision_score "
+        "mp.gold_earned, mp.gold_spent, mp.vision_score, "
+        "mp.item_0, mp.item_1, mp.item_2, mp.item_3, mp.item_4, mp.item_5, mp.item_6 "
         "FROM {} AS m "
         "INNER JOIN {} AS mp "
         "ON m.id = mp.match_id "
@@ -83,16 +84,26 @@ def get_champ_prediction():
     curr_data = []
     attributes = []
     labels = []
+    data_types = []
+    num_continuous = 29
+    num_categorical = 7
 
     # populate learning data
     for row in rows:
         # normalize by avg stats per 10 mins
         game_duration = row[1]
         per_10 = game_duration / (60 * 10)
-        curr_data = list(row[3:])
+        curr_data = list(row[3:-7])
         curr_data_norm = [x / per_10 for x in curr_data]
+        curr_data_norm.append(row[-7])
         curr_data_norm.append(row[2])
         training_data.append(curr_data_norm)
+
+    # set up data types
+    for i in range(num_continuous):
+        data_types.append(constants.DATA_TYPE_CONTINUOUS)
+    for i in range(num_categorical):
+        data_types.append(constants.DATA_TYPE_CATEGORICAL)
 
     # keep 10% of data for testing
     num_test = floor(int(limit) / 10)
@@ -107,7 +118,7 @@ def get_champ_prediction():
     # train random forest on training data
     num_trees = 20
     random_forest = random_forests.RandomForest(num_trees)
-    random_forest.bootstrapping(training_data)
+    random_forest.bootstrapping(training_data, data_types)
     random_forest.fitting()
 
     # predict on test data

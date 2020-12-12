@@ -15,6 +15,13 @@ This app currently provides the following functionality:
     - axis selectors - use list for styling? https://codepen.io/marijoha/pen/zKjvEw
     - league colors
 - champ predict algo in ui
+    - items
+        - make it order agnostic
+            - keep items as separate array indexes, add an extra index that has all items. ie. [1, 2, 3, 4, 0, 0, 0, [1, 2, 3, 4]]
+            - maybe add a constant for those type of categorical items? need a way to find the index of subarray w/ all items - used in partition_classes
+        - disregard 0s
+            - best_split() - if data type is item and value is 0, can skip
+    - add more game stats for attributes
     - create one for aram
 - think about website purpose & design
     - champion/win graphs
