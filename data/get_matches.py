@@ -364,6 +364,6 @@ def zero_if_none(data):
 
 # some names
 # Smackadummy, Vivilyn, Khayame, Ricefoxx, Faliteran
-# Yiliang Peng, SentientAI, ASTROBOY99, Spica1, TSM Spica
+# Peng Yiliang, SentientAI, ASTROBOY99, Spica1, TSM Spica
 if __name__ == "__main__":
-    get_matches("ASTROBOY99")
+    get_matches("Peng Yiliang")
